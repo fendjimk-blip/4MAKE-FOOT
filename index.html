@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ht">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>4MAKE FOOT</title>
+<title>Fendji Foot</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0b1a10">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -34,7 +34,7 @@ p{font-size:14px;margin:10px 0 4px;text-align:left;color:#cbd5e1}
 
 <div id="ov">
  <div class="pn" id="p_menu">
-  <h1>⚽ 4MAKE FOOT</h1>
+  <h1>⚽ FENDJI FOOT</h1>
   <label class="b">Non ekip Ble <input id="n0" maxlength="12" value="Ekip Ble"></label>
   <label class="r">Non ekip Wouj <input id="n1" maxlength="12" value="Ekip Wouj"></label>
   <label>Nivo òdinatè <select id="lv"><option value="0">Fasil</option><option value="1" selected>Mwayen</option><option value="2">Difisil</option></select></label>
@@ -359,4 +359,48 @@ function face(P){
   if(P.lx!==undefined){const dx=P.x-P.lx,dy=P.y-P.ly;if(Math.hypot(dx,dy)>.3)P.a=Math.atan2(dy,dx)}
   P.lx=P.x;P.ly=P.y}
 function drawPlayer(P,i){
-  ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath
+  ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(P.x+3,P.y+5,PR,PR*.85,0,0,7);ctx.fill();
+  const g=ctx.createRadialGradient(P.x-6,P.y-7,3,P.x,P.y,PR);g.addColorStop(0,LIGHT[i]);g.addColorStop(1,COL[i]);
+  circle(P.x,P.y,PR,g,'#fff');
+  circle(P.x,P.y,PR-5,null,'rgba(255,255,255,.35)');
+  circle(P.x,P.y,9,'#f0c08a','rgba(0,0,0,.4)');
+  ctx.fillStyle='#2b1d12';ctx.beginPath();ctx.arc(P.x,P.y,9,P.a+Math.PI/2,P.a+Math.PI*1.5);ctx.fill()}
+function drawBall(){
+  const dd=Math.hypot(b.x-lbx,b.y-lby);if(dd<30)rot+=dd/BR*(b.x>=lbx?1:-1);lbx=b.x;lby=b.y;
+  ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(b.x+2,b.y+4,BR,BR*.8,0,0,7);ctx.fill();
+  ctx.save();ctx.translate(b.x,b.y);ctx.rotate(rot);
+  const g=ctx.createRadialGradient(-3,-3,1,0,0,BR);g.addColorStop(0,'#fff');g.addColorStop(1,'#d4d4d8');
+  circle(0,0,BR,g,'#222');
+  ctx.fillStyle='#222';ctx.beginPath();
+  for(let i=0;i<5;i++){const a=i*Math.PI*.4-Math.PI/2;ctx.lineTo(Math.cos(a)*4.2,Math.sin(a)*4.2)}
+  ctx.closePath();ctx.fill();
+  for(let i=0;i<5;i++){const a=i*Math.PI*.4-Math.PI*.3;circle(Math.cos(a)*9,Math.sin(a)*9,2.2,'#222')}
+  ctx.restore()}
+function draw(){
+  ctx.setTransform(cv.width/W,0,0,cv.height/CH,0,0);
+  ctx.fillStyle='#0b1a10';ctx.fillRect(0,0,W,CH);
+  hud();
+  ctx.save();ctx.translate(0,OY);
+  if(mode==='guest'){ctx.translate(W/2,H/2);ctx.rotate(Math.PI);ctx.translate(-W/2,-H/2)}
+  field();pl.forEach(face);pl.forEach(drawPlayer);drawBall();
+  ctx.restore();
+  for(let i=0;i<2;i++)if(joy[i]){
+    const j=joy[i];circle(j.sx,j.sy,40,null,'rgba(255,255,255,.35)');
+    const dx=j.x-j.sx,dy=j.y-j.sy,m=Math.min(1,Math.hypot(dx,dy)/40)||0,a=Math.atan2(dy,dx);
+    circle(j.sx+Math.cos(a)*m*40,j.sy+Math.sin(a)*m*40,16,'rgba(255,255,255,.35)')}
+  for(let i=conf.length-1;i>=0;i--){const c=conf[i];c.x+=c.vx;c.y+=c.vy;c.vy+=.18;if(--c.l<=0){conf.splice(i,1);continue}ctx.fillStyle=c.c;ctx.fillRect(c.x,c.y,5,3)}
+  const cy=OY+H/2;
+  if(G.ph==='count'){textO(G.ct,W/2,cy+24,72,'#facc15');textO(G.half===2?'2yèm mitan':'Match la kòmanse',W/2,cy+60,18,'#fff')}
+  else if(G.ph==='goal')textO('GÒL!',W/2,cy+16,56,'#facc15');
+  else if(G.ph==='half'){textO('MITAN TAN',W/2,cy,34,'#facc15');textO(G.sc[0]+' - '+G.sc[1],W/2,cy+38,28,'#fff')}}
+
+let last=0,acc=0;
+function frame(ts){
+  if(!last)last=ts;acc+=Math.min(ts-last,100);last=ts;
+  while(acc>=DT){tick();acc-=DT}
+  draw();requestAnimationFrame(frame)}
+resetPos();setPanel('menu');requestAnimationFrame(frame);
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+</script>
+</body>
+</html>
