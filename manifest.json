@@ -1,0 +1,13 @@
+{
+  "name": "4MAKE FOOT",
+  "short_name": "4MAKE FOOT",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1a10",
+  "theme_color": "#0b1a10",
+  "icons": [
+    {"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
+  ]
+}
